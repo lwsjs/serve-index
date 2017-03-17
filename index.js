@@ -290,8 +290,11 @@ function createHtmlFileList(files, dir, useIcons, view) {
       ? file.stat.size
       : '';
 
+    var href = escapeHtml(normalizeSlashes(normalize(path.join('/')))) + (isDir ? '/' : '');
+    href = href === '//' ? '/' : href;
+
     return '<li><a href="'
-      + escapeHtml(normalizeSlashes(normalize(path.join('/'))))
+      + href
       + '" class="' + escapeHtml(classes.join(' ')) + '"'
       + ' title="' + escapeHtml(file.name) + '">'
       + '<span class="name">' + escapeHtml(file.name) + '</span>'
