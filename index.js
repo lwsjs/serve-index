@@ -98,7 +98,7 @@ function serveIndex(root, options) {
   var template = opts.template || defaultTemplate;
   var view = opts.view || 'tiles';
 
-  return function (req, res, next) {
+  return function (req, res, next, ctx) {
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       res.statusCode = 'OPTIONS' === req.method ? 200 : 405;
       res.setHeader('Allow', 'GET, HEAD, OPTIONS');
@@ -160,7 +160,7 @@ function serveIndex(root, options) {
 
         // not acceptable
         if (!type) return next(createError(406));
-        serveIndex[mediaType[type]](req, res, files, next, originalDir, showUp, icons, path, view, template, stylesheet);
+        serveIndex[mediaType[type]](ctx, req, res, files, next, originalDir, showUp, icons, path, view, template, stylesheet);
       });
     });
   };
@@ -170,7 +170,7 @@ function serveIndex(root, options) {
  * Respond with text/html.
  */
 
-serveIndex.html = function _html(req, res, files, next, dir, showUp, icons, path, view, template, stylesheet) {
+serveIndex.html = function _html(ctx, req, res, files, next, dir, showUp, icons, path, view, template, stylesheet) {
   var render = typeof template !== 'function'
     ? createHtmlRender(template)
     : template
@@ -208,7 +208,8 @@ serveIndex.html = function _html(req, res, files, next, dir, showUp, icons, path
       // render html
       render(locals, function (err, body) {
         if (err) return next(err);
-        send(res, 'text/html', body)
+        send(ctx, res, 'text/html', body)
+        next()
       });
     });
   });
@@ -218,16 +219,18 @@ serveIndex.html = function _html(req, res, files, next, dir, showUp, icons, path
  * Respond with application/json.
  */
 
-serveIndex.json = function _json(req, res, files) {
-  send(res, 'application/json', JSON.stringify(files))
+serveIndex.json = function _json(ctx, req, res, files, next) {
+  send(ctx, res, 'application/json', JSON.stringify(files))
+  next()
 };
 
 /**
  * Respond with text/plain.
  */
 
-serveIndex.plain = function _plain(req, res, files) {
-  send(res, 'text/plain', (files.join('\n') + '\n'))
+serveIndex.plain = function _plain(ctx, req, res, files, next) {
+  send(ctx, res, 'text/plain', (files.join('\n') + '\n'))
+  next()
 };
 
 /**
@@ -497,16 +500,16 @@ function removeHidden(files) {
  * @private
  */
 
-function send (res, type, body) {
+function send (ctx, res, type, body) {
   // security header for content sniffing
-  res.setHeader('X-Content-Type-Options', 'nosniff')
+  ctx.response.set('X-Content-Type-Options', 'nosniff')
 
   // standard headers
-  res.setHeader('Content-Type', type + '; charset=utf-8')
-  res.setHeader('Content-Length', Buffer.byteLength(body, 'utf8'))
+  ctx.response.set('Content-Type', type + '; charset=utf-8')
+  ctx.response.set('Content-Length', Buffer.byteLength(body, 'utf8'))
 
   // body
-  res.end(body, 'utf8')
+  ctx.body = body
 }
 
 /**
