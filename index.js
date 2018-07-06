@@ -240,7 +240,7 @@ serveIndex.plain = function _plain(ctx, req, res, files, next) {
 
 function createHtmlFileList(files, dir, useIcons, view) {
   var html = '<ul id="files" class="view-' + escapeHtml(view) + '">'
-    + (view == 'details' ? (
+    + (view === 'details' ? (
       '<li class="header">'
       + '<span class="name">Name</span>'
       + '<span class="size">Size</span>'
@@ -491,7 +491,7 @@ function normalizeSlashes(path) {
 
 function removeHidden(files) {
   return files.filter(function(file){
-    return '.' != file[0];
+    return file[0] !== '.'
   });
 }
 
@@ -546,6 +546,7 @@ var icons = {
   'folder': 'folder.png',
 
   // generic mime type icons
+  'font': 'font.png',
   'image': 'image.png',
   'text': 'page_white_text.png',
   'video': 'film.png',
@@ -556,7 +557,6 @@ var icons = {
   '+zip': 'box.png',
 
   // specific mime type icons
-  'application/font-woff': 'font.png',
   'application/javascript': 'page_white_code_red.png',
   'application/json': 'page_white_code.png',
   'application/msword': 'page_white_word.png',
@@ -570,7 +570,6 @@ var icons = {
   'application/vnd.oasis.opendocument.text': 'page_white_word.png',
   'application/x-7z-compressed': 'box.png',
   'application/x-sh': 'application_xp_terminal.png',
-  'application/x-font-ttf': 'font.png',
   'application/x-msaccess': 'page_white_database.png',
   'application/x-shockwave-flash': 'page_white_flash.png',
   'application/x-sql': 'page_white_database.png',
@@ -624,7 +623,6 @@ var icons = {
   '.map': 'map.png',
   '.msi': 'box.png',
   '.mv4': 'film.png',
-  '.otf': 'font.png',
   '.pdb': 'page_white_database.png',
   '.php': 'page_white_php.png',
   '.pl': 'page_white_code.png',
