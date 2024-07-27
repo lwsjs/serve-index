@@ -422,7 +422,7 @@ function iconLookup(filename) {
   // try by mime type
   if (icons[mimetype]) {
     return {
-      className: 'icon-' + mimetype.replace('/', '-'),
+      className: 'icon-' + mimetype.replace('/', '-').replace('+', '_'),
       fileName: icons[mimetype]
     };
   }
